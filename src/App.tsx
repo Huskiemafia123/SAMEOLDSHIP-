@@ -16,6 +16,7 @@ import { apiFetch } from './lib/api';
 function AppContent() {
   const [currentPage, setCurrentPage] = useState<Page>('home');
   const [logo, setLogo] = useState<string>(DEFAULT_LOGO);
+  const [heroBgUrl, setHeroBgUrl] = useState<string>('https://images.unsplash.com/photo-1505118380757-91f5f5632de0?auto=format&fit=crop&w=1920&q=80');
   const [phoneNumber, setPhoneNumber] = useState<string>('1-907-617-0402');
   const [services, setServices] = useState<Service[]>([]);
   const { isAuthenticated, isLoading: authLoading } = useAuth();
@@ -32,11 +33,9 @@ function AppContent() {
 
     // Fetch Hero BG
     const heroData = await apiFetch<{ value: string }>('/api/settings/hero_bg_url');
-    if (heroData?.value) {
-      document.documentElement.style.setProperty('--hero-url', `url(${heroData.value})`);
-    } else {
-      document.documentElement.style.setProperty('--hero-url', `url(https://images.unsplash.com/photo-1505118380757-91f5f5632de0?auto=format&fit=crop&w=1920&q=80)`);
-    }
+    const finalHeroUrl = heroData?.value || 'https://images.unsplash.com/photo-1505118380757-91f5f5632de0?auto=format&fit=crop&w=1920&q=80';
+    setHeroBgUrl(finalHeroUrl);
+    document.documentElement.style.setProperty('--hero-url', `url(${finalHeroUrl})`);
 
     // Fetch Watermark
     const watermarkData = await apiFetch<{ value: string }>('/api/settings/watermark_url');
@@ -58,6 +57,18 @@ function AppContent() {
 
     const colorData = await apiFetch<{ value: string }>('/api/settings/logo_color');
     document.documentElement.style.setProperty('--logo-color', colorData?.value || '#C9D0C4');
+
+    const heroHeightData = await apiFetch<{ value: string }>('/api/settings/hero_height');
+    document.documentElement.style.setProperty('--hero-height', `${heroHeightData?.value || '100'}vh`);
+
+    const heroZoomData = await apiFetch<{ value: string }>('/api/settings/hero_bg_zoom');
+    document.documentElement.style.setProperty('--hero-bg-zoom', heroZoomData?.value || '100');
+
+    const heroBgWidthData = await apiFetch<{ value: string }>('/api/settings/hero_bg_width');
+    document.documentElement.style.setProperty('--hero-bg-width', heroBgWidthData?.value ? `${heroBgWidthData.value}px` : 'cover');
+
+    const heroBgHeightData = await apiFetch<{ value: string }>('/api/settings/hero_bg_height');
+    document.documentElement.style.setProperty('--hero-bg-height', heroBgHeightData?.value ? `${heroBgHeightData.value}px` : 'auto');
 
     // Fetch Services
     const servicesData = await apiFetch<Service[]>('/api/services');
@@ -89,7 +100,7 @@ function AppContent() {
   const renderPage = () => {
     switch (currentPage) {
       case 'home':
-        return <Home setCurrentPage={setCurrentPage} logo={logo} phoneNumber={phoneNumber} services={services} />;
+        return <Home setCurrentPage={setCurrentPage} logo={logo} heroBgUrl={heroBgUrl} phoneNumber={phoneNumber} services={services} />;
       case 'services':
         return <Services setCurrentPage={setCurrentPage} services={services} />;
       case 'book':

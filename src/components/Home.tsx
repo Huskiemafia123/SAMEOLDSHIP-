@@ -1,19 +1,56 @@
-import React from 'react';
-import { motion } from 'motion/react';
-import { Phone, Anchor, Shield, Clock, Award, ChevronRight, Star, Wrench, ArrowRight, MapPin, HelpCircle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
+import { Phone, Anchor, Shield, Clock, Award, ChevronRight, Star, Wrench, ArrowRight, MapPin, HelpCircle, Loader2 } from 'lucide-react';
 import { Page, Service } from '../types';
 import { Logo as LogoComp } from './Logo';
 
 interface HomeProps {
   setCurrentPage: (page: Page) => void;
   logo: string;
+  heroBgUrl: string;
   phoneNumber: string;
   services: Service[];
 }
 
-export const Home: React.FC<HomeProps> = ({ setCurrentPage, logo, phoneNumber, services }) => {
+export const Home: React.FC<HomeProps> = ({ setCurrentPage, logo, heroBgUrl, phoneNumber, services }) => {
+  const [bgLoaded, setBgLoaded] = useState(false);
+  const [logoLoaded, setLogoLoaded] = useState(false);
+  const bgRef = React.useRef<HTMLImageElement>(null);
+
+  useEffect(() => {
+    if (bgRef.current && bgRef.current.complete) {
+      setBgLoaded(true);
+    }
+  }, [heroBgUrl]);
+
+  useEffect(() => {
+    // Reset loading states when URLs change
+    setBgLoaded(false);
+    setLogoLoaded(false);
+
+    // Safety timeout to show content even if assets fail to load or take too long
+    const timer = setTimeout(() => {
+      setBgLoaded(true);
+      setLogoLoaded(true);
+    }, 3500);
+
+    return () => clearTimeout(timer);
+  }, [logo, heroBgUrl]);
+
+  const isHeroReady = bgLoaded && logoLoaded;
+
   return (
     <div className="flex flex-col">
+      {/* Background Preloader */}
+      <img 
+        ref={bgRef}
+        src={heroBgUrl} 
+        className="hidden" 
+        onLoad={() => setBgLoaded(true)} 
+        onError={() => setBgLoaded(true)} // Still show content if bg fails
+        alt=""
+      />
+
       {/* Floating Action Button (FAB) */}
       <div className="fixed bottom-10 right-10 z-[100] flex flex-col gap-4">
         <motion.a 
@@ -30,12 +67,32 @@ export const Home: React.FC<HomeProps> = ({ setCurrentPage, logo, phoneNumber, s
       </div>
 
       {/* Hero Section */}
-      <section className="relative h-screen flex items-center justify-center text-center px-6 hero-texture overflow-hidden">
+      <section 
+        className="relative flex items-center justify-center text-center px-6 hero-texture overflow-hidden"
+        style={{ minHeight: 'var(--hero-height, 100vh)' }}
+      >
         <div className="absolute inset-0 bg-maritime-black/20 z-[1]" />
         
+        {/* Hero Loading Placeholder */}
+        <AnimatePresence>
+          {!isHeroReady && (
+            <motion.div 
+              initial={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.8 }}
+              className="absolute inset-0 z-[20] bg-maritime-black flex items-center justify-center"
+            >
+              <div className="flex flex-col items-center gap-4">
+                <div className="w-24 h-24 rounded-full border-4 border-seafoam/20 border-t-seafoam animate-spin" />
+                <p className="text-seafoam font-bold text-xs uppercase tracking-[0.3em] animate-pulse">Initializing Fleet Systems...</p>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         <motion.div 
           initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
+          animate={{ opacity: isHeroReady ? 1 : 0, y: isHeroReady ? 0 : 40 }}
           transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
           className="max-w-6xl relative z-10"
         >
@@ -60,6 +117,8 @@ export const Home: React.FC<HomeProps> = ({ setCurrentPage, logo, phoneNumber, s
             <LogoComp 
               src={logo} 
               tintColor="var(--logo-color)"
+              onLoad={() => setLogoLoaded(true)}
+              onError={() => setLogoLoaded(true)}
               className="relative drop-shadow-[0_0_30px_rgba(255,255,255,0.1)]"
               style={{ width: 'var(--hero-logo-size)', height: 'var(--hero-logo-size)' }}
             />

@@ -17,6 +17,10 @@ export const Profile: React.FC = () => {
     header_logo_size: '32',
     footer_logo_size: '26',
     hero_logo_size: '120',
+    hero_height: '100',
+    hero_bg_zoom: '100',
+    hero_bg_width: '1000',
+    hero_bg_height: '1000',
     logo_color: '#C9D0C4',
     phone_number: '1-907-617-0402'
   });
@@ -30,7 +34,7 @@ export const Profile: React.FC = () => {
   }, []);
 
   const fetchAssets = async () => {
-    const keys = ['logo_url', 'hero_bg_url', 'watermark_url', 'header_logo_size', 'footer_logo_size', 'hero_logo_size', 'logo_color', 'phone_number'];
+    const keys = ['logo_url', 'hero_bg_url', 'watermark_url', 'header_logo_size', 'footer_logo_size', 'hero_logo_size', 'hero_height', 'hero_bg_zoom', 'hero_bg_width', 'hero_bg_height', 'logo_color', 'phone_number'];
     const results = await Promise.all(keys.map(k => apiFetch<{ value: string }>(`/api/settings/${k}`)));
     const newAssets: any = {};
     keys.forEach((k, i) => {
@@ -63,7 +67,7 @@ export const Profile: React.FC = () => {
     if (!file) return;
 
     if (file.size > 5 * 1024 * 1024) {
-      setStatus({ type: 'error', message: 'File size too large (max 5MB)' });
+      toast.error('File size too large (max 5MB)');
       return;
     }
 
@@ -204,6 +208,72 @@ export const Profile: React.FC = () => {
               className="w-full h-2 bg-maritime-black rounded-lg appearance-none cursor-pointer accent-seafoam"
             />
             <p className="text-[10px] text-slate-500 uppercase tracking-wider">Adjusts the dimensions of the logo featured in the main hero section.</p>
+          </div>
+
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <label className="text-sm font-bold text-slate-300">Hero Section Height</label>
+              <span className="text-xs font-mono text-seafoam">{assets.hero_height}vh</span>
+            </div>
+            <input 
+              type="range" 
+              min="50" 
+              max="150" 
+              step="5"
+              value={assets.hero_height || '100'} 
+              onChange={(e) => updateSetting('hero_height', e.target.value)}
+              className="w-full h-2 bg-maritime-black rounded-lg appearance-none cursor-pointer accent-seafoam"
+            />
+            <p className="text-[10px] text-slate-500 uppercase tracking-wider">Adjusts the vertical height of the main landing page hero section.</p>
+          </div>
+
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <label className="text-sm font-bold text-slate-300">Hero Background Zoom</label>
+              <span className="text-xs font-mono text-seafoam">{assets.hero_bg_zoom}%</span>
+            </div>
+            <input 
+              type="range" 
+              min="100" 
+              max="200" 
+              step="5"
+              value={assets.hero_bg_zoom || '100'} 
+              onChange={(e) => updateSetting('hero_bg_zoom', e.target.value)}
+              className="w-full h-2 bg-maritime-black rounded-lg appearance-none cursor-pointer accent-seafoam"
+            />
+            <p className="text-[10px] text-slate-500 uppercase tracking-wider">Adjusts the zoom level of the background image in the hero section.</p>
+          </div>
+
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <label className="text-sm font-bold text-slate-300">Hero Background Width</label>
+              <span className="text-xs font-mono text-seafoam">{assets.hero_bg_width}px</span>
+            </div>
+            <input 
+              type="range" 
+              min="100" 
+              max="3000" 
+              step="50"
+              value={assets.hero_bg_width || '1000'} 
+              onChange={(e) => updateSetting('hero_bg_width', e.target.value)}
+              className="w-full h-2 bg-maritime-black rounded-lg appearance-none cursor-pointer accent-seafoam"
+            />
+          </div>
+
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <label className="text-sm font-bold text-slate-300">Hero Background Height</label>
+              <span className="text-xs font-mono text-seafoam">{assets.hero_bg_height}px</span>
+            </div>
+            <input 
+              type="range" 
+              min="100" 
+              max="3000" 
+              step="50"
+              value={assets.hero_bg_height || '1000'} 
+              onChange={(e) => updateSetting('hero_bg_height', e.target.value)}
+              className="w-full h-2 bg-maritime-black rounded-lg appearance-none cursor-pointer accent-seafoam"
+            />
           </div>
 
           <div className="space-y-4 pt-4 border-t border-seafoam/10">

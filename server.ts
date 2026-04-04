@@ -97,10 +97,15 @@ const assetCount = db.prepare("SELECT COUNT(*) as count FROM settings WHERE key 
 if (assetCount.count === 0) {
   const defaultAssets = [
     { key: 'hero_bg_url', value: 'https://images.unsplash.com/photo-1534214526114-0ea4d47b04f2?q=80&w=2000&auto=format&fit=crop' },
+    { key: 'logo_url', value: 'https://lh3.googleusercontent.com/aida-public/AB6AXuB_e-A-n-c-h-o-r-l-o-g-o-u-r-l' },
     { key: 'watermark_url', value: 'https://lh3.googleusercontent.com/aida-public/AB6AXuB_e-A-n-c-h-o-r-l-o-g-o-u-r-l' },
     { key: 'header_logo_size', value: '32' },
     { key: 'footer_logo_size', value: '26' },
-    { key: 'hero_logo_size', value: '120' }
+    { key: 'hero_logo_size', value: '120' },
+    { key: 'hero_height', value: '100' },
+    { key: 'hero_bg_zoom', value: '100' },
+    { key: 'hero_bg_width', value: '1000' },
+    { key: 'hero_bg_height', value: '1000' }
   ];
   const insertSetting = db.prepare("INSERT OR IGNORE INTO settings (key, value) VALUES (?, ?)");
   defaultAssets.forEach(a => insertSetting.run(a.key, a.value));
