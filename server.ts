@@ -177,6 +177,13 @@ async function startServer() {
   });
 
   // Settings API
+  app.get("/api/settings", (req, res) => {
+    const rows = db.prepare("SELECT key, value FROM settings").all() as { key: string, value: string }[];
+    const settings: Record<string, string> = {};
+    rows.forEach(r => settings[r.key] = r.value);
+    res.json(settings);
+  });
+
   app.get("/api/settings/:key", (req, res) => {
     const row = db.prepare("SELECT value FROM settings WHERE key = ?").get(req.params.key) as { value: string } | undefined;
     res.json({ value: row?.value || null });

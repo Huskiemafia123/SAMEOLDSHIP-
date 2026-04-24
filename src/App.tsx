@@ -23,52 +23,38 @@ function AppContent() {
 
   // Fetch data on mount
   const fetchData = async () => {
-    // Fetch Logo
-    const logoData = await apiFetch<{ value: string }>('/api/settings/logo_url');
-    if (logoData?.value) setLogo(logoData.value);
+    const settings = await apiFetch<Record<string, string>>('/api/settings');
+    if (!settings) return;
 
-    // Fetch Phone
-    const phoneData = await apiFetch<{ value: string }>('/api/settings/phone_number');
-    if (phoneData?.value) setPhoneNumber(phoneData.value);
+    // Update Logo
+    if (settings.logo_url) setLogo(settings.logo_url);
 
-    // Fetch Hero BG
-    const heroData = await apiFetch<{ value: string }>('/api/settings/hero_bg_url');
-    const finalHeroUrl = heroData?.value || 'https://images.unsplash.com/photo-1505118380757-91f5f5632de0?auto=format&fit=crop&w=1920&q=80';
+    // Update Phone
+    if (settings.phone_number) setPhoneNumber(settings.phone_number);
+
+    // Update Hero BG
+    const finalHeroUrl = settings.hero_bg_url || 'https://images.unsplash.com/photo-1505118380757-91f5f5632de0?auto=format&fit=crop&w=1920&q=80';
     setHeroBgUrl(finalHeroUrl);
-    document.documentElement.style.setProperty('--hero-url', `url(${finalHeroUrl})`);
+    document.documentElement.style.setProperty('--hero-url', `url("${finalHeroUrl}")`);
 
-    // Fetch Watermark
-    const watermarkData = await apiFetch<{ value: string }>('/api/settings/watermark_url');
-    if (watermarkData?.value) {
-      document.documentElement.style.setProperty('--logo-url', `url(${watermarkData.value})`);
-    } else {
-      document.documentElement.style.setProperty('--logo-url', `url(${logoData?.value || DEFAULT_LOGO})`);
-    }
+    // Update Watermark
+    const watermarkUrl = settings.watermark_url || settings.logo_url || DEFAULT_LOGO;
+    document.documentElement.style.setProperty('--logo-url', `url("${watermarkUrl}")`);
 
-    // Fetch Sizes
-    const headerSizeData = await apiFetch<{ value: string }>('/api/settings/header_logo_size');
-    document.documentElement.style.setProperty('--header-logo-size', `${headerSizeData?.value || '32'}px`);
+    // Update Sizes & Colors
+    const setProp = (key: string, name: string, defaultValue: string, unit: string = '') => {
+      document.documentElement.style.setProperty(name, `${settings[key] || defaultValue}${unit}`);
+    };
 
-    const footerSizeData = await apiFetch<{ value: string }>('/api/settings/footer_logo_size');
-    document.documentElement.style.setProperty('--footer-logo-size', `${footerSizeData?.value || '26'}px`);
-
-    const heroSizeData = await apiFetch<{ value: string }>('/api/settings/hero_logo_size');
-    document.documentElement.style.setProperty('--hero-logo-size', `${heroSizeData?.value || '120'}px`);
-
-    const colorData = await apiFetch<{ value: string }>('/api/settings/logo_color');
-    document.documentElement.style.setProperty('--logo-color', colorData?.value || '#C9D0C4');
-
-    const heroHeightData = await apiFetch<{ value: string }>('/api/settings/hero_height');
-    document.documentElement.style.setProperty('--hero-height', `${heroHeightData?.value || '100'}vh`);
-
-    const heroZoomData = await apiFetch<{ value: string }>('/api/settings/hero_bg_zoom');
-    document.documentElement.style.setProperty('--hero-bg-zoom', heroZoomData?.value || '100');
-
-    const heroBgWidthData = await apiFetch<{ value: string }>('/api/settings/hero_bg_width');
-    document.documentElement.style.setProperty('--hero-bg-width', heroBgWidthData?.value ? `${heroBgWidthData.value}px` : 'cover');
-
-    const heroBgHeightData = await apiFetch<{ value: string }>('/api/settings/hero_bg_height');
-    document.documentElement.style.setProperty('--hero-bg-height', heroBgHeightData?.value ? `${heroBgHeightData.value}px` : 'auto');
+    setProp('header_logo_size', '--header-logo-size', '32', 'px');
+    setProp('footer_logo_size', '--footer-logo-size', '26', 'px');
+    setProp('hero_logo_size', '--hero-logo-size', '120', 'px');
+    setProp('logo_color', '--logo-color', '#C9D0C4');
+    setProp('hero_height', '--hero-height', '100', 'vh');
+    setProp('hero_bg_zoom', '--hero-bg-zoom', '100');
+    
+    document.documentElement.style.setProperty('--hero-bg-width', settings.hero_bg_width ? `${settings.hero_bg_width}px` : 'cover');
+    document.documentElement.style.setProperty('--hero-bg-height', settings.hero_bg_height ? `${settings.hero_bg_height}px` : 'auto');
 
     // Fetch Services
     const servicesData = await apiFetch<Service[]>('/api/services');
@@ -124,7 +110,7 @@ function AppContent() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-maritime-black relative overflow-hidden">
+    <div className="min-h-screen flex flex-col bg-maritime-black relative overflow-hidden maritime-bg">
       <Toaster position="top-center" theme="dark" richColors />
       <div className="atmosphere" />
       <Header currentPage={currentPage} setCurrentPage={setCurrentPage} logo={logo} phoneNumber={phoneNumber} />
