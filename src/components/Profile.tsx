@@ -134,25 +134,37 @@ export const Profile: React.FC = () => {
             <h2 className="text-4xl md:text-5xl font-serif font-bold text-white tracking-tight">Console</h2>
           </div>
           <div className="flex items-center gap-2 text-slate-500 ml-1">
-            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-xs font-mono uppercase tracking-[0.2em]">{userEmail}</span>
+            <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+            <span className="text-xs font-mono uppercase tracking-[0.2em]">Static Preview Mode</span>
           </div>
         </motion.div>
         
         <motion.div variants={itemVariants} className="flex items-center gap-4">
           <div className="hidden lg:flex flex-col items-end mr-4">
-            <span className="text-[10px] uppercase tracking-widest text-slate-500 font-bold mb-1">Last Update</span>
-            <span className="text-sm font-mono text-seafoam">04.24.2026 : 08:03</span>
+            <span className="text-[10px] uppercase tracking-widest text-slate-500 font-bold mb-1">Archive Date</span>
+            <span className="text-sm font-mono text-seafoam">04.24.2026 : 08:30</span>
           </div>
-          <button 
-            onClick={logout}
-            className="flex items-center gap-3 px-6 py-3 rounded-2xl bg-white/5 text-slate-300 border border-white/10 hover:bg-red-500 hover:text-white hover:border-red-400 transition-all text-sm font-bold shadow-xl backdrop-blur-xl"
-          >
-            <LogOut size={18} />
-            <span>Terminate Session</span>
-          </button>
+          <div className="hidden sm:block px-6 py-3 rounded-2xl bg-amber-500/10 text-amber-500 border border-amber-500/20 text-xs font-bold font-mono tracking-widest uppercase">
+            Read Only
+          </div>
         </motion.div>
       </header>
+
+      {/* Warning Banner */}
+      <motion.div 
+        variants={itemVariants}
+        className="mb-12 p-6 rounded-3xl bg-amber-500/5 border border-amber-500/20 flex flex-col md:flex-row items-center gap-6 text-center md:text-left"
+      >
+        <div className="w-12 h-12 shrink-0 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-500 border border-amber-500/20">
+          <AlertCircle size={24} />
+        </div>
+        <div className="flex-1">
+          <h4 className="text-sm font-bold text-amber-500 uppercase tracking-widest mb-1">System Architecture: Static Export</h4>
+          <p className="text-slate-400 text-xs leading-relaxed max-w-3xl">
+            This application is currently running in a static configuration. Changes made in this console will be reflected in the current session but will not be persisted to the source code. To update the identity permanently, modify <code className="text-seafoam">src/data.ts</code> directly.
+          </p>
+        </div>
+      </motion.div>
       
       {/* Bento Grid Asset Management */}
       <motion.section variants={itemVariants} className="mb-24">

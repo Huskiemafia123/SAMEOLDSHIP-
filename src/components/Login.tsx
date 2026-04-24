@@ -37,7 +37,8 @@ export const Login: React.FC = () => {
               <LogIn size={40} strokeWidth={1.5} />
             </div>
             <h2 className="text-4xl font-serif font-bold mb-3 tracking-tight">Admin Portal</h2>
-            <p className="text-slate-500 text-sm font-medium uppercase tracking-widest">Secure Access Required</p>
+            <p className="text-slate-500 text-sm font-medium uppercase tracking-widest">Static Preview Mode</p>
+            <p className="mt-4 text-[10px] text-amber-500 font-bold uppercase tracking-widest bg-amber-500/5 py-2 rounded-lg border border-amber-500/10">Any credentials will grant access</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-8 relative z-10">

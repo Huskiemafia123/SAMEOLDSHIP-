@@ -26,9 +26,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUserEmail(null);
   };
 
-  const login = async (email: string, password: string): Promise<boolean> => {
-    console.log('Static mode: login disabled');
-    return false;
+  const login = async (email: string, _password: string): Promise<boolean> => {
+    // In static mode, we allow exploration of the admin console
+    setIsAuthenticated(true);
+    setUserEmail(email);
+    return true;
   };
 
   const logout = async () => {
