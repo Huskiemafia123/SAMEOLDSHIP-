@@ -11,30 +11,20 @@ import { motion, AnimatePresence } from 'motion/react';
 import { LOGO_URL as DEFAULT_LOGO } from './constants';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { Toaster } from 'sonner';
-import { apiFetch } from './lib/api';
+import { settings, services as staticServices } from './data';
 
 function AppContent() {
   const [currentPage, setCurrentPage] = useState<Page>('home');
-  const [logo, setLogo] = useState<string>(DEFAULT_LOGO);
-  const [heroBgUrl, setHeroBgUrl] = useState<string>('https://images.unsplash.com/photo-1505118380757-91f5f5632de0?auto=format&fit=crop&w=1920&q=80');
-  const [phoneNumber, setPhoneNumber] = useState<string>('1-907-617-0402');
-  const [services, setServices] = useState<Service[]>([]);
+  const [logo, setLogo] = useState<string>(settings.logo_url || DEFAULT_LOGO);
+  const [heroBgUrl, setHeroBgUrl] = useState<string>(settings.hero_bg_url || 'https://images.unsplash.com/photo-1505118380757-91f5f5632de0?auto=format&fit=crop&w=1920&q=80');
+  const [phoneNumber, setPhoneNumber] = useState<string>(settings.phone_number || '1-907-617-0402');
+  const [services, setServices] = useState<Service[]>(staticServices as Service[]);
   const { isAuthenticated, isLoading: authLoading } = useAuth();
 
-  // Fetch data on mount
-  const fetchData = async () => {
-    const settings = await apiFetch<Record<string, string>>('/api/settings');
-    if (!settings) return;
-
-    // Update Logo
-    if (settings.logo_url) setLogo(settings.logo_url);
-
-    // Update Phone
-    if (settings.phone_number) setPhoneNumber(settings.phone_number);
-
+  // Load data on mount
+  const loadStaticData = () => {
     // Update Hero BG
     const finalHeroUrl = settings.hero_bg_url || 'https://images.unsplash.com/photo-1505118380757-91f5f5632de0?auto=format&fit=crop&w=1920&q=80';
-    setHeroBgUrl(finalHeroUrl);
     document.documentElement.style.setProperty('--hero-url', `url("${finalHeroUrl}")`);
 
     // Update Watermark
@@ -43,7 +33,7 @@ function AppContent() {
 
     // Update Sizes & Colors
     const setProp = (key: string, name: string, defaultValue: string, unit: string = '') => {
-      document.documentElement.style.setProperty(name, `${settings[key] || defaultValue}${unit}`);
+      document.documentElement.style.setProperty(name, `${(settings as any)[key] || defaultValue}${unit}`);
     };
 
     setProp('header_logo_size', '--header-logo-size', '32', 'px');
@@ -55,19 +45,10 @@ function AppContent() {
     
     document.documentElement.style.setProperty('--hero-bg-width', settings.hero_bg_width ? `${settings.hero_bg_width}px` : 'cover');
     document.documentElement.style.setProperty('--hero-bg-height', settings.hero_bg_height ? `${settings.hero_bg_height}px` : 'auto');
-
-    // Fetch Services
-    const servicesData = await apiFetch<Service[]>('/api/services');
-    if (servicesData) setServices(servicesData);
   };
 
   useEffect(() => {
-    fetchData();
-
-    // Listen for updates
-    const handleUpdate = () => fetchData();
-    window.addEventListener('logoUpdated', handleUpdate);
-    return () => window.removeEventListener('logoUpdated', handleUpdate);
+    loadStaticData();
   }, []);
 
   // Scroll to top on page change

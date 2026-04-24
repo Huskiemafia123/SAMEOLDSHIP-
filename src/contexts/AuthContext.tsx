@@ -21,39 +21,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const checkAuth = async () => {
-    try {
-      const data = await apiFetch<{ authenticated: boolean; email: string }>('/api/auth/me');
-      if (data?.authenticated) {
-        setIsAuthenticated(true);
-        setUserEmail(data.email);
-      } else {
-        setIsAuthenticated(false);
-        setUserEmail(null);
-      }
-    } catch (error) {
-      console.error('Auth check failed:', error);
-    } finally {
-      setIsLoading(false);
-    }
+    setIsLoading(false);
+    setIsAuthenticated(false);
+    setUserEmail(null);
   };
 
   const login = async (email: string, password: string): Promise<boolean> => {
-    const data = await apiFetch<{ success: boolean }>('/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-    });
-    
-    if (data) {
-      setIsAuthenticated(true);
-      setUserEmail(email);
-      return true;
-    }
+    console.log('Static mode: login disabled');
     return false;
   };
 
   const logout = async () => {
-    await apiFetch('/api/auth/logout', { method: 'POST' });
+    console.log('Static mode: logout disabled');
     setIsAuthenticated(false);
     setUserEmail(null);
   };
